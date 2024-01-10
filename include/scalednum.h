@@ -61,32 +61,32 @@
 
 
 /*! \brief flags
- * \sa     humanreadable_create()
+ * \sa     scalednum_create()
  * \name   SCALEDNUM_VERSION_*
  * \{
  */
 /*! \brief mask to isolate prefix type */
-#define HUMANREADABLE_PREFIXTYPE_MASK 0x0001
+#define SCALEDNUM_PREFIXTYPE_MASK 0x0001
 /*! \brief use short prefix */
-#define HUMANREADABLE_SHORTPREFIX     0x0000
+#define SCALEDNUM_SHORTPREFIX     0x0000
 /*! \brief use long prefix */
-#define HUMANREADABLE_LONGPREFIX      0x0001
+#define SCALEDNUM_LONGPREFIX      0x0001
 
 /*! \brief don't insert a space between value and magnitude */
-#define HUMANREADABLE_NOSPACE         0x0002
+#define SCALEDNUM_NOSPACE         0x0002
 
 /*! \brief whole number, so base magnitude values will not have digits after the floating point */
-#define HUMANREADABLE_NOFRACTION      0x0004
+#define SCALEDNUM_NOFRACTION      0x0004
 
 /*! \brief always show sign (except for 0) */
-#define HUMANREADABLE_FORCESIGN       0x0008
+#define SCALEDNUM_FORCESIGN       0x0008
 
 /*! \brief mask to isolate magnitude type */
-#define HUMANREADABLE_MAGNITUDE_MASK  0xFF00
+#define SCALEDNUM_MAGNITUDE_MASK  0xFF00
 /*! \brief use 1000 for kilo */
-#define HUMANREADABLE_KILO1000        0x0000
+#define SCALEDNUM_KILO1000        0x0000
 /*! \brief use 1024 for kilo (implies whole numbers) */
-#define HUMANREADABLE_KILO1024       (0x0100 | HUMANREADABLE_NOFRACTION)
+#define SCALEDNUM_KILO1024       (0x0100 | SCALEDNUM_NOFRACTION)
 /*! @} */
 
 
@@ -110,22 +110,66 @@ SCALEDNUM_EXPORT void scalednum_get_version (int* pmajor, int* pminor, int* pmic
 SCALEDNUM_EXPORT const char* scalednum_get_version_string ();
 
 /*! \brief handle type used by scalednum library
- * \sa     humanreadable_create()
- * \sa     humanreadable_free()
+ * \sa     scalednum_create()
+ * \sa     scalednum_free()
  */
-typedef struct humanreadable_struct* humanreadable;
+typedef struct scalednum_struct* scalednum;
 
-SCALEDNUM_EXPORT humanreadable humanreadable_create (unsigned int significantdigits, unsigned int flags, const char* suffixplural, const char* suffixsingular);
+/*! \brief create scalednum handle
+ * \param  significantdigits    total number of significant digits to display
+ * \param  flags                flags to use (combination of SCALEDNUM_VERSION_*)
+ * \param  suffixplural         plural suffix (or NULL if no suffix)
+ * \param  suffixsingular       singular suffix (or NULL to use plural suffix)
+ * \return scalednum handle
+ * \sa     SCALEDNUM_VERSION_*
+ * \sa     scalednum_free()
+ */
+SCALEDNUM_EXPORT scalednum scalednum_create (unsigned int significantdigits, unsigned int flags, const char* suffixplural, const char* suffixsingular);
 
-SCALEDNUM_EXPORT void humanreadable_free (humanreadable);
+/*! \brief destroy scalednum handle
+ * \param  scalednum            scalednum handle
+ * \sa     scalednum_create()
+ */
+SCALEDNUM_EXPORT void scalednum_free (scalednum);
 
-SCALEDNUM_EXPORT int humanreadable_to_buffer (humanreadable handle, double value, char* buf, size_t buflen);
+/*! \brief store human readable value in buffer
+ * \param  scalednum            scalednum handle
+ * \param  value                value
+ * \param  buf                  memory buffer
+ * \param  buflen               size of memory buffer (must be large enough to hold human readable representation and trailing '\0')
+ * \return buffer size needed to store human readable representation (output to buffer will be truncated if buflen was too small)
+ * \sa     scalednum_create()
+ * \sa     scalednum_print()
+ */
+SCALEDNUM_EXPORT int scalednum_to_buffer (scalednum handle, double value, char* buf, size_t buflen);
 
-SCALEDNUM_EXPORT void humanreadable_print (humanreadable handle, double value);
+/*! \brief print human readable value to console
+ * \param  scalednum            scalednum handle
+ * \param  value                value
+ * \sa     scalednum_create()
+ * \sa     scalednum_print()
+ */
+SCALEDNUM_EXPORT void scalednum_print (scalednum handle, double value);
 
-typedef int (*humanreadable_iterate_magnitudes_callback_fn) (double base, double exponent, const char* const prefixnames[2], void* callbackdata);
+/*! \brief function type used to iterate through posible magnitudes
+ * \param  base                 base (multiplier is base ^ exponent)
+ * \param  exponent             exponent (multiplier is base ^ exponent)
+ * \param  prefixnames          array with short and long prefix names (e.g. ["k", "kilo"])
+ * \param  callbackdata         callback data as passed to scalednum_iterate_magnitudes()
+ * \return zero to continue or non-zero to abort
+ * \sa     scalednum_iterate_magnitudes()
+ * \sa     scalednum_create()
+ */
+typedef int (*scalednum_iterate_magnitudes_callback_fn) (double base, double exponent, const char* const prefixnames[2], void* callbackdata);
 
-SCALEDNUM_EXPORT void humanreadable_iterate_magnitudes (humanreadable handle, humanreadable_iterate_magnitudes_callback_fn callbackfn, void* callbackdata);
+/*! \brief function type used to iterate through posible magnitudes
+ * \param  scalednum            scalednum handle
+ * \param  callbackfn           function of type scalednum_iterate_magnitudes_callback_fn to call for each entry
+ * \param  callbackdata         callback data to be passed to callbackfn
+ * \sa     scalednum_iterate_magnitudes_callback_fn()
+ * \sa     scalednum_create()
+ */
+SCALEDNUM_EXPORT void scalednum_iterate_magnitudes (scalednum handle, scalednum_iterate_magnitudes_callback_fn callbackfn, void* callbackdata);
 
 #ifdef __cplusplus
 }

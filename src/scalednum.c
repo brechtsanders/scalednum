@@ -107,8 +107,8 @@ struct number_magnitude_struct {
 };
 */
 
-struct humanreadable_struct {
-  unsigned int flags;                                             //flags used when humanreadable_create() was called
+struct scalednum_struct {
+  unsigned int flags;                                             //flags used when scalednum_create() was called
   const struct magnitude_definition_struct* magnitudedefinition;  //magnitude definition to be used
   unsigned int significantdigits;                                 //number of significant digits to display
   unsigned int prefixindex;                                       //index to use in prefixnames
@@ -119,16 +119,16 @@ struct humanreadable_struct {
 #endif
 };
 
-SCALEDNUM_EXPORT humanreadable humanreadable_create (unsigned int significantdigits, unsigned int flags, const char* suffixplural, const char* suffixsingular)
+SCALEDNUM_EXPORT scalednum scalednum_create (unsigned int significantdigits, unsigned int flags, const char* suffixplural, const char* suffixsingular)
 {
-  struct humanreadable_struct* handle;
-  if ((handle = (struct humanreadable_struct*)malloc(sizeof(struct humanreadable_struct))) == NULL)
+  struct scalednum_struct* handle;
+  if ((handle = (struct scalednum_struct*)malloc(sizeof(struct scalednum_struct))) == NULL)
     return NULL;  //memory allocation error
-  switch (flags & HUMANREADABLE_MAGNITUDE_MASK) {
-    case HUMANREADABLE_KILO1000 & HUMANREADABLE_MAGNITUDE_MASK:
+  switch (flags & SCALEDNUM_MAGNITUDE_MASK) {
+    case SCALEDNUM_KILO1000 & SCALEDNUM_MAGNITUDE_MASK:
       handle->magnitudedefinition = &magnitude_kilo1000;
       break;
-    case HUMANREADABLE_KILO1024 & HUMANREADABLE_MAGNITUDE_MASK:
+    case SCALEDNUM_KILO1024 & SCALEDNUM_MAGNITUDE_MASK:
       handle->magnitudedefinition = &magnitude_kilo1024;
       break;
     default:
@@ -137,7 +137,7 @@ SCALEDNUM_EXPORT humanreadable humanreadable_create (unsigned int significantdig
   }
   handle->flags = flags;
   handle->significantdigits = (significantdigits < 1 ? 1 : significantdigits);
-  handle->prefixindex = flags & HUMANREADABLE_PREFIXTYPE_MASK;
+  handle->prefixindex = flags & SCALEDNUM_PREFIXTYPE_MASK;
   if (!suffixplural) {
     handle->suffixplural = NULL;
   } else {
@@ -161,12 +161,12 @@ SCALEDNUM_EXPORT humanreadable humanreadable_create (unsigned int significantdig
   handle->maxlength = (suffixplural ? strlen(suffixplural) : 0);
   if (suffixsingular && strlen(suffixsingular) > handle->maxlength)
     handle->maxlength = strlen(suffixsingular);
-  handle->maxlength += 1 /* sign */ + handle->significantdigits + 1 /* floating point character */ + (flags & HUMANREADABLE_NOSPACE ? 0 : 1) + handle->magnitudedefinition->prefix_longest_length[handle->prefixindex] + 1 /* terminating '\0' character */;
+  handle->maxlength += 1 /* sign */ + handle->significantdigits + 1 /* floating point character */ + (flags & SCALEDNUM_NOSPACE ? 0 : 1) + handle->magnitudedefinition->prefix_longest_length[handle->prefixindex] + 1 /* terminating '\0' character */;
 #endif
   return handle;
 }
 
-SCALEDNUM_EXPORT void humanreadable_free (humanreadable handle)
+SCALEDNUM_EXPORT void scalednum_free (scalednum handle)
 {
   if (handle->suffixsingular) {
     if (handle->suffixsingular != handle->suffixplural)
@@ -177,7 +177,7 @@ SCALEDNUM_EXPORT void humanreadable_free (humanreadable handle)
   free(handle);
 }
 
-SCALEDNUM_EXPORT void humanreadable_iterate_magnitudes (humanreadable handle, humanreadable_iterate_magnitudes_callback_fn callbackfn, void* callbackdata)
+SCALEDNUM_EXPORT void scalednum_iterate_magnitudes (scalednum handle, scalednum_iterate_magnitudes_callback_fn callbackfn, void* callbackdata)
 {
   int i;
   for (i = 0; i <= handle->magnitudedefinition->maxindex; i++) {
@@ -186,7 +186,7 @@ SCALEDNUM_EXPORT void humanreadable_iterate_magnitudes (humanreadable handle, hu
   }
 }
 
-SCALEDNUM_EXPORT int humanreadable_to_buffer (humanreadable handle, double value, char* buf, size_t buflen)
+SCALEDNUM_EXPORT int scalednum_to_buffer (scalednum handle, double value, char* buf, size_t buflen)
 {
   int power;
   double scaledvalue;
@@ -206,20 +206,20 @@ SCALEDNUM_EXPORT int humanreadable_to_buffer (humanreadable handle, double value
 #else
   scaleddigits = (value == 0 ? 1 : trunc(log(fabs(scaledvalue)) / log(10)) + 1);
 #endif
-  return snprintf(buf, buflen, "%s%.*f%s%s%s", (value > 0 && handle->flags & HUMANREADABLE_FORCESIGN ? "+" : ""), (scaleddigits < handle->significantdigits && !(power == 0 && handle->flags & HUMANREADABLE_NOFRACTION)? handle->significantdigits - scaleddigits : 0), scaledvalue, (handle->flags & HUMANREADABLE_NOSPACE ? "" : " "), handle->magnitudedefinition->prefixnames[handle->magnitudedefinition->zeroindex + power].prefixname[handle->prefixindex], (value == 1 && handle->suffixsingular ? handle->suffixsingular : (handle->suffixplural ? handle->suffixplural : "")));
+  return snprintf(buf, buflen, "%s%.*f%s%s%s", (value > 0 && handle->flags & SCALEDNUM_FORCESIGN ? "+" : ""), (scaleddigits < handle->significantdigits && !(power == 0 && handle->flags & SCALEDNUM_NOFRACTION)? handle->significantdigits - scaleddigits : 0), scaledvalue, (handle->flags & SCALEDNUM_NOSPACE ? "" : " "), handle->magnitudedefinition->prefixnames[handle->magnitudedefinition->zeroindex + power].prefixname[handle->prefixindex], (value == 1 && handle->suffixsingular ? handle->suffixsingular : (handle->suffixplural ? handle->suffixplural : "")));
 }
 
-SCALEDNUM_EXPORT void humanreadable_print (humanreadable handle, double value)
+SCALEDNUM_EXPORT void scalednum_print (scalednum handle, double value)
 {
   char staticbuf[64];
   char* buf;
   size_t buflen;
-  if ((buflen = humanreadable_to_buffer(handle, value, staticbuf, sizeof(staticbuf))) < sizeof(staticbuf)) {
+  if ((buflen = scalednum_to_buffer(handle, value, staticbuf, sizeof(staticbuf))) < sizeof(staticbuf)) {
     printf("%s", staticbuf);
   } else if ((buf = (char*)malloc(++buflen)) == NULL) {
     printf("MEMORY ALLOCATION ERROR");
   } else {
-    humanreadable_to_buffer(handle, value, buf, buflen);
+    scalednum_to_buffer(handle, value, buf, buflen);
     printf("%s", buf);
     free(buf);
   }
