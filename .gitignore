@@ -1,0 +1,4 @@
+bin/
+obj/
+build_cmake/
+*.layout
