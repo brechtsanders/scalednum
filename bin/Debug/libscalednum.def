@@ -1,3 +1,0 @@
-EXPORTS
-    scalednum_get_version @1
-    scalednum_get_version_string @2
