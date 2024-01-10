@@ -1,6 +1,8 @@
 bin/
 obj/
 build_cmake/
+doc/html/
+doc/man/
 *.layout
 *.zip
 *.tar.gz

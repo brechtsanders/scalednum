@@ -38,7 +38,7 @@
 /*! \brief minor version number */
 #define SCALEDNUM_VERSION_MINOR 0
 /*! \brief micro version number */
-#define SCALEDNUM_VERSION_MICRO 1
+#define SCALEDNUM_VERSION_MICRO 2
 /*! @} */
 
 /*! \brief packed version number */
@@ -127,13 +127,13 @@ typedef struct scalednum_struct* scalednum;
 SCALEDNUM_EXPORT scalednum scalednum_create (unsigned int significantdigits, unsigned int flags, const char* suffixplural, const char* suffixsingular);
 
 /*! \brief destroy scalednum handle
- * \param  scalednum            scalednum handle
+ * \param  handle               scalednum handle
  * \sa     scalednum_create()
  */
-SCALEDNUM_EXPORT void scalednum_free (scalednum);
+SCALEDNUM_EXPORT void scalednum_free (scalednum handle);
 
 /*! \brief store human readable value in buffer
- * \param  scalednum            scalednum handle
+ * \param  handle               scalednum handle
  * \param  value                value
  * \param  buf                  memory buffer
  * \param  buflen               size of memory buffer (must be large enough to hold human readable representation and trailing '\0')
@@ -144,7 +144,7 @@ SCALEDNUM_EXPORT void scalednum_free (scalednum);
 SCALEDNUM_EXPORT int scalednum_to_buffer (scalednum handle, double value, char* buf, size_t buflen);
 
 /*! \brief print human readable value to console
- * \param  scalednum            scalednum handle
+ * \param  handle               scalednum handle
  * \param  value                value
  * \sa     scalednum_create()
  * \sa     scalednum_print()
@@ -163,7 +163,7 @@ SCALEDNUM_EXPORT void scalednum_print (scalednum handle, double value);
 typedef int (*scalednum_iterate_magnitudes_callback_fn) (double base, double exponent, const char* const prefixnames[2], void* callbackdata);
 
 /*! \brief function type used to iterate through posible magnitudes
- * \param  scalednum            scalednum handle
+ * \param  handle               scalednum handle
  * \param  callbackfn           function of type scalednum_iterate_magnitudes_callback_fn to call for each entry
  * \param  callbackdata         callback data to be passed to callbackfn
  * \sa     scalednum_iterate_magnitudes_callback_fn()
