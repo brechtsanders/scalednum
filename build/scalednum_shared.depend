@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1704837188 source:z:\scalednum\src\scalednum.c
+	"scalednum.h"
+	<stdio.h>
+	<stdlib.h>
+	<stdint.h>
+	<inttypes.h>
+	<math.h>
+	<string.h>
+
+1704876223 z:\scalednum\include\scalednum.h
+	<stddef.h>
+

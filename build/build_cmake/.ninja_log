@@ -1,0 +1,11 @@
+# ninja log v5
+27	142	7265796208559370	CMakeFiles/scalednum_demo.dir/src/scalednum_demo.c.obj	2c28798ed807c471
+21	191	7265796209034335	CMakeFiles/scalednum_STATIC.dir/src/scalednum.c.obj	bbb216577a0eeecd
+24	211	7265796209041176	CMakeFiles/scalednum_SHARED.dir/src/scalednum.c.obj	4d95eabc477ddb19
+29	249	0	CMakeFiles/doc	15630f79596352b
+29	249	0	Z:/scalednum/build/build_cmake/CMakeFiles/doc	15630f79596352b
+201	287	7265796210053507	libscalednum.a	b1d85e17224f0c4c
+214	320	7265796210336096	libscalednum.dll	b0f74f6b9f50b034
+214	320	7265796210336096	libscalednum.dll.a	b0f74f6b9f50b034
+321	423	7265796211378777	scalednum_demo.exe	ba25939c76c1d44a
+424	1523	0	CMakeFiles/install/strip.util	f8341cecc341b671

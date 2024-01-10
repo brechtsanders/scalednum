@@ -1,0 +1,12 @@
+EXPORTS
+    humanreadable_create @1
+    humanreadable_free @2
+    humanreadable_iterate_magnitudes @3
+    humanreadable_print @4
+    humanreadable_to_buffer @5
+    magnitude_kilo1000 @6 DATA
+    magnitude_kilo1024 @7 DATA
+    magnitude_prefixes_kilo1000 @8 DATA
+    magnitude_prefixes_kilo1024 @9 DATA
+    scalednum_get_version @10
+    scalednum_get_version_string @11

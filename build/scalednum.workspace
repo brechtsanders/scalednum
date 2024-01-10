@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="scalednum">
+		<Project filename="scalednum_static.cbp" />
+		<Project filename="scalednum_shared.cbp" />
+		<Project filename="scalednum_demo_static.cbp">
+			<Depends filename="scalednum_static.cbp" />
+		</Project>
+		<Project filename="scalednum_demo_shared.cbp">
+			<Depends filename="scalednum_shared.cbp" />
+		</Project>
+	</Workspace>
+</CodeBlocks_workspace_file>

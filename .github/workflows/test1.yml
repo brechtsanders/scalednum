@@ -1,0 +1,32 @@
+name: Manually triggered workflow
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Person to greet'
+        required: true
+        default: 'Mona the Octocat'
+      home:
+        description: 'location'
+        required: false
+
+jobs:
+  job3:
+    runs-on: ubuntu-latest
+    needs: [job1, job2]
+    steps:
+    - run: |
+        echo "Job 3 - depends on job 1 and 2"
+  job2:
+    runs-on: ubuntu-latest
+    needs: job1
+    steps:
+    - run: |
+        echo "Job 2 - depends on job 1"
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+        echo "Job 1 - no dependancies"
+        echo "Hello ${{ github.event.inputs.name }}!"
+        echo "- in ${{ github.event.inputs.home }}!"

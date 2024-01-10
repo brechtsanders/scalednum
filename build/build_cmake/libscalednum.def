@@ -1,0 +1,8 @@
+EXPORTS
+    humanreadable_create @1
+    humanreadable_free @2
+    humanreadable_iterate_magnitudes @3
+    humanreadable_print @4
+    humanreadable_to_buffer @5
+    scalednum_get_version @6
+    scalednum_get_version_string @7
