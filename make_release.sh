@@ -13,8 +13,11 @@ if echo $SCALEDNUM_PLATFORM|grep -q "^\(mingw\|windows\)"; then
  SCALEDNUM_PLATFORM=windows
 fi
 
+# build source package
+tar cfJ scalednum-$SCALEDNUM_VERSION_MAJOR.$SCALEDNUM_VERSION_MINOR.$SCALEDNUM_VERSION_MICRO.tar.xz doc/* include/* src/* CMakeLists.txt LICENSE README.md Changelog.txt &&
+
+# build binary packages
 BUILDDIR=$(realpath $(dirname $0))/build.$SCALEDNUM_ARCH.$SCALEDNUM_PLATFORM
-# configure, build and test
 cmake -Wno-dev -GNinja -DCMAKE_INSTALL_PREFIX:PATH=$BUILDDIR/install -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_SHARED:BOOL=ON -DBUILD_STATIC:BOOL=ON -DBUILD_DEMO:BOOL=ON -S. -B$BUILDDIR/build &&
 ninja -C$BUILDDIR/build install/strip &&
 pushd $BUILDDIR/install &&
