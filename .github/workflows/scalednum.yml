@@ -1,0 +1,113 @@
+name: GitHub-CI for scalednum
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false          # if a job fails don't abort other jobs
+      matrix:
+        config:
+          - {
+              name: "Ubuntu Linux (gcc)",
+              os: ubuntu-latest,
+              shell: bash,
+              #cmake_generator: "Unix Makefiles",
+              cmake_generator: "Ninja",
+              cc: gcc,
+              cxx: g++
+            }
+          - {
+              name: "Ubuntu Linux (clang)",
+              os: ubuntu-latest,
+              shell: bash,
+              #cmake_generator: "Unix Makefiles",
+              cmake_generator: "Ninja",
+              cc: clang,
+              cxx: clang++
+            }
+          - {
+              name: "macOS (clang)",
+              os: macos-latest,
+              shell: bash,
+              cmake_generator: "Unix Makefiles",
+              cc: clang,
+              cxx: clang++
+            }
+          - {
+              name: "Windows 64-bit (gcc)",
+              os: windows-latest,
+              shell: 'msys2 {0}',
+              #cmake_generator: "MSYS Makefiles",
+              cmake_generator: "Ninja",
+              msystem: MINGW64,
+              arch: x86_64,
+              cc: x86_64-w64-mingw32-gcc.exe,
+              cxx: x86_64-w64-mingw32-g++.exe
+            }
+          - {
+              name: "Windows 32-bit (gcc)",
+              os: windows-latest,
+              shell: 'msys2 {0}',
+              #cmake_generator: "MSYS Makefiles",
+              cmake_generator: "Ninja",
+              msystem: MINGW32,
+              arch: i686,
+              cc: i686-w64-mingw32-gcc.exe,
+              cxx: i686-w64-mingw32-g++.exe
+            }
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    defaults:
+      run:
+        shell: ${{ matrix.config.shell }}
+    env:
+      CC: ${{ matrix.config.cc }}
+      CXX: ${{ matrix.config.cxx }}
+
+    steps:
+    - if: matrix.config.os == 'ubuntu-latest'
+      name: Install build dependencies (Linux)
+      run: |
+        sudo apt-get install cmake ninja-build
+    - if: matrix.config.os == 'macos-latest'
+      name: Install build dependencies (macOS)
+      run: |
+        brew install ninja
+    - if: matrix.config.os == 'windows-latest'
+      name: Install build dependencies (Windows)
+      uses: msys2/setup-msys2@v2
+      with:
+        update: false
+        msystem: ${{ matrix.config.msystem }}
+        install: >-
+          git
+          mingw-w64-${{ matrix.config.arch }}-cmake
+          mingw-w64-${{ matrix.config.arch }}-ninja
+          mingw-w64-${{ matrix.config.arch }}-toolchain
+    - uses: actions/checkout@v1
+    - name: Configure (cmake)
+      run: |
+        cmake -G"${{ matrix.config.cmake_generator }}" \
+         -DCMAKE_C_COMPILER=${{ matrix.config.cc }} \
+         -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }} \
+         -DCMAKE_INSTALL_PREFIX:PATH=../build_result \
+         -DBUILD_STATIC:BOOL=ON \
+         -DBUILD_SHARED:BOOL=ON \
+         -DBUILD_UTILS:BOOL=ON \
+         -DBUILD_DOCUMENTATION:BOOL=OFF \
+         -S. -Bbuild_temp
+#    - if: matrix.config.cmake_generator != 'Ninja'
+#      name: Build (make)
+#      run: |
+#        make -Cbuild_temp install/strip
+    - if: matrix.config.cmake_generator == 'Ninja'
+      name: Build (ninja)
+      run: |
+        ninja -Cbuild_temp install/strip
+#    - name: Test
+#      run: |
+#        LD_LIBRARY_PATH=$PWD/build_result/lib:$LD_LIBRARY_PATH DYLD_LIBRARY_PATH=$PWD/build_result/lib:$DYLD_LIBRARY_PATH build_result/bin/scalednum_demo
