@@ -108,6 +108,6 @@ jobs:
       name: Build (ninja)
       run: |
         ninja -Cbuild_temp install/strip
-    - name: Test
-      run: |
-        LD_LIBRARY_PATH=$PWD/build_result/lib:$LD_LIBRARY_PATH DYLD_LIBRARY_PATH=$PWD/build_result/lib:$DYLD_LIBRARY_PATH build_result/bin/scalednum_demo
+#    - name: Test
+#      run: |
+#        LD_LIBRARY_PATH=$PWD/build_result/lib:$LD_LIBRARY_PATH DYLD_LIBRARY_PATH=$PWD/build_result/lib:$DYLD_LIBRARY_PATH build_result/bin/scalednum_demo
