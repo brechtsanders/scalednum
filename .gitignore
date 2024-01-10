@@ -2,3 +2,7 @@ bin/
 obj/
 build_cmake/
 *.layout
+*.zip
+*.tar.gz
+*.tar.bz2
+*.tar.xz
